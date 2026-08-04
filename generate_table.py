@@ -1,0 +1,333 @@
+#!/usr/bin/env python3
+"""
+27届校园招聘信息HTML表格生成器
+生成带全字段筛选功能的交互式HTML表格
+"""
+import json
+import datetime
+from campus_data import RECRUITMENT_DATA, LAST_UPDATED
+
+def generate_html():
+    data_json = json.dumps(RECRUITMENT_DATA, ensure_ascii=False)
+
+    # 收集所有筛选选项
+    nature_set = sorted(set(d["企业性质"] for d in RECRUITMENT_DATA))
+    edu_set = sorted(set(d["要求学历"] for d in RECRUITMENT_DATA))
+    city_list = set()
+    for d in RECRUITMENT_DATA:
+        for c in d["工作城市"].split("/"):
+            city_list.add(c.strip())
+    city_set = sorted(city_list)
+
+    nature_options = "".join(f'<option value="{n}">{n}</option>' for n in nature_set)
+    edu_options = "".join(f'<option value="{e}">{e}</option>' for e in edu_set)
+    city_options = "".join(f'<option value="{c}">{c}</option>' for c in city_set)
+
+    html = f'''<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>2027届校园招聘信息汇总表</title>
+<style>
+* {{ margin: 0; padding: 0; box-sizing: border-box; }}
+body {{
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+    background: #f5f6fa; color: #2d3436; line-height: 1.6;
+}}
+.header {{
+    background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+    color: white; padding: 28px 32px; text-align: center;
+}}
+.header h1 {{ font-size: 26px; font-weight: 700; letter-spacing: 1px; }}
+.header .subtitle {{ font-size: 13px; color: #a0b4c8; margin-top: 6px; }}
+.header .stats {{ display: flex; justify-content: center; gap: 28px; margin-top: 14px; flex-wrap: wrap; }}
+.header .stat-item {{ background: rgba(255,255,255,0.12); border-radius: 8px; padding: 8px 18px; }}
+.header .stat-item .num {{ font-size: 22px; font-weight: 700; color: #ffd700; }}
+.header .stat-item .label {{ font-size: 11px; color: #a0b4c8; }}
+
+.container {{ max-width: 1400px; margin: 0 auto; padding: 20px 24px; }}
+
+/* 筛选面板 */
+.filter-panel {{
+    background: white; border-radius: 12px; padding: 18px 22px;
+    margin-bottom: 16px; box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+    display: flex; flex-wrap: wrap; gap: 12px; align-items: center;
+}}
+.filter-panel label {{ font-size: 13px; font-weight: 600; color: #555; white-space: nowrap; }}
+.filter-panel select, .filter-panel input {{
+    padding: 7px 10px; border: 1.5px solid #ddd; border-radius: 6px;
+    font-size: 13px; background: #fafbfc; min-width: 110px;
+    transition: border-color 0.2s;
+}}
+.filter-panel select:focus, .filter-panel input:focus {{
+    outline: none; border-color: #0f3460; box-shadow: 0 0 0 3px rgba(15,52,96,0.08);
+}}
+.filter-panel .search-box {{ flex: 1; min-width: 180px; }}
+.filter-panel .search-box input {{ width: 100%; }}
+.btn-reset {{
+    background: #e74c3c; color: white; border: none; border-radius: 6px;
+    padding: 7px 16px; font-size: 13px; cursor: pointer; font-weight: 600;
+    transition: background 0.2s;
+}}
+.btn-reset:hover {{ background: #c0392b; }}
+.result-count {{ font-size: 13px; color: #888; margin-left: auto; white-space: nowrap; }}
+
+/* 表格 */
+.table-wrapper {{
+    background: white; border-radius: 12px; overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+}}
+table {{
+    width: 100%; border-collapse: collapse; font-size: 13.5px;
+}}
+thead {{ background: #0f3460; color: white; position: sticky; top: 0; z-index: 10; }}
+th {{
+    padding: 12px 10px; text-align: left; font-weight: 600; white-space: nowrap;
+    cursor: pointer; user-select: none; position: relative;
+}}
+th:hover {{ background: #1a4a80; }}
+th .sort-icon {{ font-size: 10px; margin-left: 4px; opacity: 0.5; }}
+th.sorted .sort-icon {{ opacity: 1; color: #ffd700; }}
+td {{ padding: 10px; border-bottom: 1px solid #eee; vertical-align: top; }}
+tr:hover {{ background: #f0f4ff; }}
+tr:nth-child(even) {{ background: #fafbfc; }}
+tr:nth-child(even):hover {{ background: #f0f4ff; }}
+
+/* 列样式 */
+.col-name {{ font-weight: 600; color: #0f3460; min-width: 110px; }}
+.col-nature {{ text-align: center; }}
+.col-nature .badge {{
+    display: inline-block; padding: 2px 10px; border-radius: 12px;
+    font-size: 11.5px; font-weight: 600;
+}}
+.badge-央国企 {{ background: #ffeaa7; color: #b8860b; }}
+.badge-民营企业 {{ background: #dfe6e9; color: #2d3436; }}
+.badge-外企 {{ background: #81ecec; color: #006266; }}
+
+.col-job {{ min-width: 180px; font-size: 12.5px; color: #555; }}
+.col-city {{ min-width: 120px; font-size: 12px; color: #555; }}
+.col-time {{ min-width: 120px; font-size: 12px; color: #e17055; font-weight: 500; }}
+.col-major {{ min-width: 160px; font-size: 12px; color: #555; }}
+.col-edu {{ text-align: center; white-space: nowrap; }}
+.col-edu .edu-tag {{
+    display: inline-block; padding: 2px 8px; border-radius: 4px;
+    font-size: 11.5px; font-weight: 500; background: #e8f4fd; color: #0f3460;
+}}
+.col-link {{ text-align: center; }}
+.col-link a {{
+    color: #0984e3; text-decoration: none; font-weight: 500;
+    padding: 4px 10px; border-radius: 4px; background: #e8f4fd;
+    display: inline-block; font-size: 12px; transition: all 0.2s;
+}}
+.col-link a:hover {{ background: #0984e3; color: white; }}
+
+/* 响应式 */
+@media (max-width: 768px) {{
+    .filter-panel {{ flex-direction: column; align-items: stretch; }}
+    .filter-panel select, .filter-panel input {{ width: 100%; }}
+    .table-wrapper {{ overflow-x: auto; }}
+    table {{ font-size: 12px; }}
+}}
+
+/* 打印优化 */
+@media print {{
+    body {{ background: white; }}
+    .header {{ background: #0f3460 !important; -webkit-print-color-adjust: exact; }}
+    .filter-panel, .btn-reset {{ display: none; }}
+    .table-wrapper {{ box-shadow: none; }}
+}}
+</style>
+</head>
+<body>
+
+<div class="header">
+    <h1>🎓 2027届校园招聘信息汇总表</h1>
+    <div class="subtitle">数据更新时间：{LAST_UPDATED} | 覆盖互联网/硬科技/汽车/央国企/外企/咨询等热门赛道</div>
+    <div class="stats">
+        <div class="stat-item"><span class="num">{len(RECRUITMENT_DATA)}</span><span class="label"> 家企业</span></div>
+        <div class="stat-item"><span class="num">{len(nature_set)}</span><span class="label"> 种企业性质</span></div>
+        <div class="stat-item"><span class="num">{len(city_set)}</span><span class="label"> 座城市</span></div>
+    </div>
+</div>
+
+<div class="container">
+    <!-- 筛选面板 -->
+    <div class="filter-panel" id="filterPanel">
+        <label>🔍 搜索：</label>
+        <span class="search-box"><input type="text" id="searchInput" placeholder="输入企业名称或岗位关键词..." oninput="applyFilters()"></span>
+
+        <label>企业性质：</label>
+        <select id="filterNature" onchange="applyFilters()">
+            <option value="">全部</option>
+            {nature_options}
+        </select>
+
+        <label>学历要求：</label>
+        <select id="filterEdu" onchange="applyFilters()">
+            <option value="">全部</option>
+            {edu_options}
+        </select>
+
+        <label>工作城市：</label>
+        <select id="filterCity" onchange="applyFilters()">
+            <option value="">全部</option>
+            {city_options}
+        </select>
+
+        <button class="btn-reset" onclick="resetFilters()">🔄 重置筛选</button>
+        <span class="result-count" id="resultCount">显示 {len(RECRUITMENT_DATA)} 条</span>
+    </div>
+
+    <!-- 数据表格 -->
+    <div class="table-wrapper">
+        <table id="dataTable">
+            <thead>
+                <tr>
+                    <th onclick="sortTable(0)" class="sorted"># <span class="sort-icon">▼</span></th>
+                    <th onclick="sortTable(1)">企业名称 <span class="sort-icon">⇅</span></th>
+                    <th onclick="sortTable(2)">企业性质 <span class="sort-icon">⇅</span></th>
+                    <th onclick="sortTable(3)">招聘岗位 <span class="sort-icon">⇅</span></th>
+                    <th onclick="sortTable(4)">工作城市 <span class="sort-icon">⇅</span></th>
+                    <th onclick="sortTable(5)">招聘时间段 <span class="sort-icon">⇅</span></th>
+                    <th onclick="sortTable(6)">要求专业 <span class="sort-icon">⇅</span></th>
+                    <th onclick="sortTable(7)">要求学历 <span class="sort-icon">⇅</span></th>
+                    <th>招聘网址</th>
+                </tr>
+            </thead>
+            <tbody id="tableBody">
+            </tbody>
+        </table>
+    </div>
+
+    <div style="text-align:center; padding:20px; color:#999; font-size:12px;">
+        ⚠️ 数据来源网络公开信息，请以企业官网最新公告为准 | 脚本可定期刷新更新
+    </div>
+</div>
+
+<script>
+// 数据
+const allData = {data_json};
+
+let currentSortCol = -1;
+let currentSortDir = 'asc';
+
+function getBadgeClass(nature) {{
+    if (nature.includes('央国企')) return 'badge-央国企';
+    if (nature.includes('民营')) return 'badge-民营企业';
+    if (nature.includes('外企') || nature.includes('外资')) return 'badge-外企';
+    return '';
+}}
+
+function renderRow(d, idx) {{
+    const badgeClass = getBadgeClass(d['企业性质']);
+    return `
+        <tr>
+            <td>${{idx + 1}}</td>
+            <td class="col-name">${{d['企业名称']}}</td>
+            <td class="col-nature"><span class="badge ${{badgeClass}}">${{d['企业性质']}}</span></td>
+            <td class="col-job">${{d['招聘岗位']}}</td>
+            <td class="col-city">${{d['工作城市']}}</td>
+            <td class="col-time">${{d['招聘时间段']}}</td>
+            <td class="col-major">${{d['要求专业']}}</td>
+            <td class="col-edu"><span class="edu-tag">${{d['要求学历']}}</span></td>
+            <td class="col-link"><a href="${{d['招聘网址']}}" target="_blank" rel="noopener">🔗 投递链接</a></td>
+        </tr>`;
+}}
+
+function renderTable(data) {{
+    const tbody = document.getElementById('tableBody');
+    tbody.innerHTML = data.map((d, i) => renderRow(d, i)).join('');
+    document.getElementById('resultCount').textContent = `显示 ${{data.length}} 条`;
+}}
+
+function applyFilters() {{
+    const search = document.getElementById('searchInput').value.toLowerCase().trim();
+    const nature = document.getElementById('filterNature').value;
+    const edu = document.getElementById('filterEdu').value;
+    const city = document.getElementById('filterCity').value;
+
+    let filtered = allData.filter(d => {{
+        // 关键词搜索（企业名称 + 岗位 + 专业）
+        if (search) {{
+            const haystack = (d['企业名称'] + ' ' + d['招聘岗位'] + ' ' + d['要求专业'] + ' ' + d['工作城市']).toLowerCase();
+            if (!haystack.includes(search)) return false;
+        }}
+        if (nature && d['企业性质'] !== nature) return false;
+        if (edu && d['要求学历'] !== edu) return false;
+        if (city && !d['工作城市'].includes(city)) return false;
+        return true;
+    }});
+
+    if (currentSortCol >= 0) {{
+        filtered = sortData(filtered, currentSortCol, currentSortDir);
+    }}
+
+    renderTable(filtered);
+}}
+
+function sortData(data, colIdx, dir) {{
+    const keys = ['企业名称', '企业性质', '招聘岗位', '工作城市', '招聘时间段', '要求专业', '要求学历'];
+    // colIdx 0 = index, so subtract 1 for key lookup
+    const key = colIdx === 0 ? null : keys[colIdx - 1];
+
+    return [...data].sort((a, b) => {{
+        let va, vb;
+        if (key) {{
+            va = a[key]; vb = b[key];
+        }} else {{
+            // sort by original index
+            va = allData.indexOf(a); vb = allData.indexOf(b);
+        }}
+        if (va < vb) return dir === 'asc' ? -1 : 1;
+        if (va > vb) return dir === 'asc' ? 1 : -1;
+        return 0;
+    }});
+}}
+
+function sortTable(colIdx) {{
+    if (currentSortCol === colIdx) {{
+        currentSortDir = currentSortDir === 'asc' ? 'desc' : 'asc';
+    }} else {{
+        currentSortCol = colIdx;
+        currentSortDir = 'asc';
+    }}
+
+    // update sort icons
+    document.querySelectorAll('th').forEach(th => th.classList.remove('sorted'));
+    document.querySelectorAll('th')[colIdx].classList.add('sorted');
+    const icon = document.querySelectorAll('th .sort-icon')[colIdx];
+    icon.textContent = currentSortDir === 'asc' ? '▲' : '▼';
+
+    applyFilters();
+}}
+
+function resetFilters() {{
+    document.getElementById('searchInput').value = '';
+    document.getElementById('filterNature').value = '';
+    document.getElementById('filterEdu').value = '';
+    document.getElementById('filterCity').value = '';
+    currentSortCol = -1;
+    currentSortDir = 'asc';
+    document.querySelectorAll('th').forEach(th => th.classList.remove('sorted'));
+    document.querySelectorAll('th .sort-icon').forEach(icon => icon.textContent = '⇅');
+    renderTable(allData);
+}}
+
+// 初始渲染
+renderTable(allData);
+</script>
+
+</body>
+</html>'''
+
+    return html
+
+
+if __name__ == "__main__":
+    html_content = generate_html()
+    output_path = "/workspace/campus_recruitment/27届校招信息汇总表.html"
+    with open(output_path, "w", encoding="utf-8") as f:
+        f.write(html_content)
+    print(f"✅ HTML表格已生成：{output_path}")
+    print(f"   共 {len(RECRUITMENT_DATA)} 家企业")
