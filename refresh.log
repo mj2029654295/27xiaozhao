@@ -18,3 +18,23 @@
 FileNotFoundError: [Errno 2] No such file or directory: '/workspace/campus_recruitment/27届校招信息汇总表.html'
 [2026-08-04 02:30:49]   已同步 index.html
 [2026-08-04 02:30:49] ✅ 刷新完成！
+[2026-08-04 02:36:02] 🚀 手动刷新模式
+[2026-08-04 02:36:02] ============================================================
+[2026-08-04 02:36:02] 开始检查27届校招更新...
+[2026-08-04 02:36:02]   正在抓取: 国资央企招聘平台 (https://cujiuye.iguopin.com/notice)
+[2026-08-04 02:36:03]     找到 0 条潜在招聘信息
+[2026-08-04 02:36:03]   正在抓取: 华中科技大学就业网 (https://job.hust.edu.cn/zpxx123123/index.htm)
+[2026-08-04 02:36:04]     找到 12 条潜在招聘信息
+[2026-08-04 02:36:04]   正在抓取: 武汉理工大学就业网 (https://scc.whut.edu.cn/)
+[2026-08-04 02:36:06]     找到 0 条潜在招聘信息
+[2026-08-04 02:36:06] 本轮共发现 12 条潜在新信息
+[2026-08-04 02:36:06] （详细数据需手动核实后添加到 campus_data.py）
+[2026-08-04 02:36:06]   重新生成HTML表格...
+[2026-08-04 02:36:06]   
+[2026-08-04 02:36:06]   stderr: Traceback (most recent call last):
+  File "/home/runner/work/27xiaozhao/27xiaozhao/generate_table.py", line 330, in <module>
+    with open(output_path, "w", encoding="utf-8") as f:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory: '/workspace/campus_recruitment/27届校招信息汇总表.html'
+[2026-08-04 02:36:06]   已同步 index.html
+[2026-08-04 02:36:06] ✅ 刷新完成！
