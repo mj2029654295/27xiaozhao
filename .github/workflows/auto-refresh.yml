@@ -1,1 +1,38 @@
 
+name: 自动刷新校招表格
+on:
+  schedule:
+    - cron: '0 */6 * * *'
+  workflow_dispatch:
+
+jobs:
+  refresh-and-deploy:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: 检出代码
+        uses: actions/checkout@v4
+
+      - name: 设置Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: 安装依赖
+        run: pip install requests beautifulsoup4 lxml
+
+      - name: 运行刷新脚本
+        run: python refresh_campus.py
+
+      - name: 同步index.html
+        run: cp 27届校招信息汇总表.html index.html
+
+      - name: 提交更新
+        run: |
+          git config user.name "CampusBot"
+          git config user.email "bot@campus.local"
+          git add 27届校招信息汇总表.html campus_data.py refresh.log index.html
+          git diff --staged --quiet || git commit -m "自动刷新"
+          git push
