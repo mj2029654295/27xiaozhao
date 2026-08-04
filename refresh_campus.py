@@ -1,20 +1,10 @@
 #!/usr/bin/env python3
 """
 27届校招信息自动刷新脚本（增强版）
-数据来源：
-1. 牛客网校招日程 (nowcoder.com)
-2. 华中科技大学就业网 (job.hust.edu.cn)
-3. 华北电力大学就业网 (job.ncepu.edu.cn)
-4. 国资央企招聘平台 (iguopin.com)
-
-功能：
-- 自动抓取新企业信息
-- 与现有数据比对，只添加新企业
-- 重新生成HTML表格
+数据来源：牛客网 / 华中科技大学 / 华北电力大学 / 国资央企招聘平台
 """
 import os
 import sys
-import time
 import json
 import re
 import datetime
@@ -27,11 +17,9 @@ SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 DATA_FILE = os.path.join(SCRIPT_DIR, "campus_data.py")
 HTML_FILE = os.path.join(SCRIPT_DIR, "27届校招信息汇总表.html")
 LOG_FILE = os.path.join(SCRIPT_DIR, "refresh.log")
-REFRESH_INTERVAL = 6 * 3600
 
 HEADERS = {
-    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 "
-                  "(KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
     "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
     "Accept-Language": "zh-CN,zh;q=0.9,en;q=0.8",
 }
@@ -53,7 +41,7 @@ def load_existing_data():
         import campus_data
         return campus_data.RECRUITMENT_DATA
     except Exception as e:
-        log(f"  ⚠️ 加载现有数据失败: {e}")
+        log(f"  加载现有数据失败: {e}")
         return []
 
 
@@ -61,55 +49,43 @@ def fetch_nowcoder():
     log("  正在抓取: 牛客网校招日程")
     results = []
     try:
-        url = "https://www.nowcoder.com/school/schedule?type=2"
+        url = "https://www.nowcoder.com/school/schedule"
         resp = requests.get(url, headers=HEADERS, timeout=20)
-        resp.raise_for_status()
         soup = BeautifulSoup(resp.text, "html.parser")
-        for a in soup.find_all("a", href=True):
-            text = a.get_text(strip=True)
+        cards = soup.find_all("a", href=True)
+        found = 0
+        for a in cards:
+            text = a.get_text(" ", strip=True)
             href = a["href"]
-            if len(text) < 3:
+            if "27" not in text:
                 continue
-            if not any(kw in text for kw in ["27届", "27秋招", "2027"]):
-                continue
-            lines = [l.strip() for l in text.split("\n") if l.strip()]
-            company_name = ""
-            city = ""
-            recruit_type = "27届校招"
-            for line in lines:
-                if "地点：" in line or "地点:" in line:
-                    city = re.sub(r"地点[：:]", "", line).strip()
-                elif "27届" in line or "27秋招" in line or "2027" in line:
-                    recruit_type = line.split("丨")[0].strip() if "丨" in line else line
-                elif line and not company_name and "收录" not in line and "收藏" not in line:
-                    if 2 < len(line) < 30:
-                        company_name = line
-            parent = a.parent
-            if parent:
-                parent_text = parent.get_text(separator="\n", strip=True)
-                parent_lines = [l.strip() for l in parent_text.split("\n") if l.strip()]
-                for line in parent_lines:
-                    if "地点：" in line or "地点:" in line:
-                        city = re.sub(r"地点[：:]", "", line).strip()
-                    elif not company_name and 2 < len(line) < 30 and "收录" not in line and "收藏" not in line and "27" not in line and "2027" not in line:
-                        if not any(skip in line for skip in ["立即投递", "官网投递", "收藏", "http"]):
-                            company_name = line
             if not href.startswith("http"):
                 href = urljoin("https://www.nowcoder.com", href)
-            if company_name and len(company_name) > 1:
+            name = ""
+            city = ""
+            for line in text.split("\n"):
+                line = line.strip()
+                if not line:
+                    continue
+                if "地点" in line:
+                    city = line.split("：")[-1].split(":")[-1].strip()
+                elif len(line) < 40 and not name and "收藏" not in line and "http" not in line:
+                    name = line
+            if name and len(name) > 1:
                 results.append({
-                    "企业名称": company_name,
+                    "企业名称": name,
                     "企业性质": "待确认",
-                    "招聘岗位": recruit_type,
-                    "工作城市": city if city else "详见官网",
+                    "招聘岗位": "27届校招",
+                    "工作城市": city or "详见官网",
                     "招聘时间段": "2026年8月-招满即止",
                     "要求专业": "详见官网",
                     "要求学历": "本科及以上",
                     "招聘网址": href
                 })
-        log(f"    牛客网: 找到 {len(results)} 条27届校招信息")
+                found += 1
+        log(f"    牛客网: 找到 {found} 条")
     except Exception as e:
-        log(f"    ⚠️ 牛客网抓取失败: {e}")
+        log(f"    牛客网抓取失败: {e}")
     return results
 
 
@@ -119,7 +95,6 @@ def fetch_hust():
     try:
         url = "https://job.hust.edu.cn/zpxx123123/index.htm"
         resp = requests.get(url, headers=HEADERS, timeout=15)
-        resp.raise_for_status()
         resp.encoding = "utf-8"
         soup = BeautifulSoup(resp.text, "html.parser")
         for a in soup.find_all("a", href=True):
@@ -134,4 +109,161 @@ def fetch_hust():
                 company_name = company_name.replace(rm, "")
             company_name = company_name.strip(" -—_")
             if company_name and len(company_name) > 2 and "毕业生生源" not in company_name:
-        
+                results.append({
+                    "企业名称": company_name,
+                    "企业性质": "待确认",
+                    "招聘岗位": "详见官网",
+                    "工作城市": "详见官网",
+                    "招聘时间段": "2026年8月-招满即止",
+                    "要求专业": "详见官网",
+                    "要求学历": "本科及以上",
+                    "招聘网址": href
+                })
+        log(f"    华科就业网: 找到 {len(results)} 条")
+    except Exception as e:
+        log(f"    华科就业网抓取失败: {e}")
+    return results
+
+
+def fetch_ncepu():
+    log("  正在抓取: 华北电力大学就业网")
+    results = []
+    try:
+        url = "https://job.ncepu.edu.cn/"
+        resp = requests.get(url, headers=HEADERS, timeout=15)
+        resp.encoding = "utf-8"
+        soup = BeautifulSoup(resp.text, "html.parser")
+        for a in soup.find_all("a", href=True):
+            text = a.get_text(strip=True)
+            href = a["href"]
+            if not any(kw in text for kw in ["2027", "27届"]):
+                continue
+            if not href.startswith("http"):
+                href = urljoin("https://job.ncepu.edu.cn", href)
+            company_name = text
+            for rm in ["2027届", "27届", "毕业生", "校企联合培养", "宣讲会", "招聘", "简章", "公告", "已举办"]:
+                company_name = company_name.replace(rm, "")
+            company_name = re.sub(r'\d{4}-\d{2}-\d{2}', '', company_name)
+            company_name = re.sub(r'\d{2}:\d{2}-\d{2}:\d{2}', '', company_name)
+            company_name = company_name.strip(" -—_(周一二三四五六日)")
+            if company_name and len(company_name) > 2:
+                results.append({
+                    "企业名称": company_name,
+                    "企业性质": "待确认",
+                    "招聘岗位": "详见官网",
+                    "工作城市": "详见官网",
+                    "招聘时间段": "2026年8月-招满即止",
+                    "要求专业": "详见官网",
+                    "要求学历": "本科及以上",
+                    "招聘网址": href
+                })
+        log(f"    华电就业网: 找到 {len(results)} 条")
+    except Exception as e:
+        log(f"    华电就业网抓取失败: {e}")
+    return results
+
+
+def fetch_iguopin():
+    log("  正在抓取: 国资央企招聘平台")
+    results = []
+    try:
+        url = "https://cujiuye.iguopin.com/notice"
+        resp = requests.get(url, headers=HEADERS, timeout=15)
+        resp.encoding = "utf-8"
+        soup = BeautifulSoup(resp.text, "html.parser")
+        for a in soup.find_all("a", href=True):
+            text = a.get_text(strip=True)
+            href = a["href"]
+            if not any(kw in text for kw in ["2027", "27届", "校招"]):
+                continue
+            if not href.startswith("http"):
+                href = urljoin("https://cujiuye.iguopin.com", href)
+            company_name = text.replace("2027届", "").replace("校园招聘", "").replace("校招", "").strip()
+            if company_name and len(company_name) > 2 and "查看详情" not in company_name:
+                results.append({
+                    "企业名称": company_name,
+                    "企业性质": "央国企",
+                    "招聘岗位": "详见官网",
+                    "工作城市": "详见官网",
+                    "招聘时间段": "2026年8月-招满即止",
+                    "要求专业": "详见官网",
+                    "要求学历": "本科及以上",
+                    "招聘网址": href
+                })
+        log(f"    国聘网: 找到 {len(results)} 条")
+    except Exception as e:
+        log(f"    国聘网抓取失败: {e}")
+    return results
+
+def merge_data(existing_data, new_data):
+    existing_names = {d["企业名称"] for d in existing_data}
+    added = []
+    for item in new_data:
+        name = item["企业名称"]
+        if name not in existing_names:
+            existing_data.append(item)
+            existing_names.add(name)
+            added.append(name)
+    log(f"  本次新增 {len(added)} 家企业:")
+    for name in added:
+        log(f"    + {name}")
+    return existing_data, added
+
+
+def save_data_file(data):
+    today = datetime.datetime.now().strftime("%Y-%m-%d %H:%M")
+    lines = [
+        '"""', "27届校园招聘数据源",
+        "数据结构: {企业名称, 企业性质, 招聘岗位, 工作城市, 招聘时间段, 要求专业, 要求学历, 招聘网址}",
+        '"""', "import datetime", "",
+        "# 当前更新时间",
+        'LAST_UPDATED = datetime.datetime.now().strftime("%Y-%m-%d %H:%M")  # 实际更新: ' + today,
+        "", "RECRUITMENT_DATA = ["
+    ]
+    for item in data:
+        lines.append("    {")
+        for key, val in item.items():
+            lines.append(f'        "{key}": "{val}",')
+        lines.append("    },")
+    lines.append("]")
+    with open(DATA_FILE, "w", encoding="utf-8") as f:
+        f.write("\n".join(lines))
+
+
+def regenerate_html():
+    log("  重新生成HTML表格...")
+    result = subprocess.run(
+        ["python3", os.path.join(SCRIPT_DIR, "generate_table.py")],
+        capture_output=True, text=True, cwd=SCRIPT_DIR
+    )
+    log(f"  {result.stdout.strip()}")
+    if result.stderr:
+        log(f"  {result.stderr.strip()}")
+    import shutil
+    src = os.path.join(SCRIPT_DIR, "27届校招信息汇总表.html")
+    dst = os.path.join(SCRIPT_DIR, "index.html")
+    if os.path.exists(src):
+        shutil.copy2(src, dst)
+        log(f"  已同步 index.html")
+
+
+def run_once():
+    log("=" * 60)
+    log("🚀 开始自动刷新27届校招信息...")
+    existing_data = load_existing_data()
+    log(f"  现有数据: {len(existing_data)} 家企业")
+    all_new = []
+    all_new.extend(fetch_nowcoder())
+    all_new.extend(fetch_hust())
+    all_new.extend(fetch_ncepu())
+    all_new.extend(fetch_iguopin())
+    log(f"  共抓取到 {len(all_new)} 条潜在新信息")
+    merged_data, added = merge_data(existing_data, all_new)
+    log(f"  合并后总计: {len(merged_data)} 家企业")
+    save_data_file(merged_data)
+    regenerate_html()
+    log("✅ 刷新完成！")
+
+
+if __name__ == "__main__":
+    run_once()
