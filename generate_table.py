@@ -326,8 +326,9 @@ renderTable(allData);
 
 if __name__ == "__main__":
     html_content = generate_html()
-    output_path = "/workspace/campus_recruitment/27届校招信息汇总表.html"
+    output_path = "27届校招信息汇总表.html"
     with open(output_path, "w", encoding="utf-8") as f:
         f.write(html_content)
+
     print(f"✅ HTML表格已生成：{output_path}")
     print(f"   共 {len(RECRUITMENT_DATA)} 家企业")
