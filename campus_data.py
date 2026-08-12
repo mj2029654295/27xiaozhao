@@ -5,7 +5,7 @@
 import datetime
 
 # 当前更新时间
-LAST_UPDATED = datetime.datetime.now().strftime("%Y-%m-%d %H:%M")  # 实际更新: 2026-08-12 01:27
+LAST_UPDATED = datetime.datetime.now().strftime("%Y-%m-%d %H:%M")  # 实际更新: 2026-08-12 07:18
 
 RECRUITMENT_DATA = [
     {
@@ -1247,5 +1247,15 @@ RECRUITMENT_DATA = [
         "要求专业": "详见官网",
         "要求学历": "本科及以上",
         "招聘网址": "https://job.hust.edu.cn/zpinfo1/2407226.htm",
+    },
+    {
+        "企业名称": "招商银行·招银网络科技 2027秋季校园",
+        "企业性质": "待确认",
+        "招聘岗位": "详见官网",
+        "工作城市": "详见官网",
+        "招聘时间段": "2026年8月-招满即止",
+        "要求专业": "详见官网",
+        "要求学历": "本科及以上",
+        "招聘网址": "https://job.ncepu.edu.cn/zpgg/ac419b1a94b14f9ba31629d7802a44e0.htm",
     },
 ]
