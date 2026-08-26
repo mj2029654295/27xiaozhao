@@ -5,7 +5,7 @@
 import datetime
 
 # 当前更新时间
-LAST_UPDATED = datetime.datetime.now().strftime("%Y-%m-%d %H:%M")  # 实际更新: 2026-08-26 06:39
+LAST_UPDATED = datetime.datetime.now().strftime("%Y-%m-%d %H:%M")  # 实际更新: 2026-08-26 12:41
 
 RECRUITMENT_DATA = [
     {
@@ -2447,5 +2447,15 @@ RECRUITMENT_DATA = [
         "要求专业": "详见官网",
         "要求学历": "本科及以上",
         "招聘网址": "https://job.hust.edu.cn/zpinfo1/2407457.htm",
+    },
+    {
+        "企业名称": "华北电力大学生源信息正式发布！",
+        "企业性质": "待确认",
+        "招聘岗位": "详见官网",
+        "工作城市": "详见官网",
+        "招聘时间段": "2026年8月-招满即止",
+        "要求专业": "详见官网",
+        "要求学历": "本科及以上",
+        "招聘网址": "https://mp.weixin.qq.com/s/Jhs31Xs_uJexPZh6v9f3VA",
     },
 ]
