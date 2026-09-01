@@ -5,7 +5,7 @@
 import datetime
 
 # 当前更新时间
-LAST_UPDATED = datetime.datetime.now().strftime("%Y-%m-%d %H:%M")  # 实际更新: 2026-09-01 10:59
+LAST_UPDATED = datetime.datetime.now().strftime("%Y-%m-%d %H:%M")  # 实际更新: 2026-09-01 15:58
 
 RECRUITMENT_DATA = [
     {
@@ -3857,5 +3857,15 @@ RECRUITMENT_DATA = [
         "要求专业": "详见官网",
         "要求学历": "本科及以上",
         "招聘网址": "https://job.ncepu.edu.cn/xjh/6093c25ef8034a16a3bc804264cd7dff.htm",
+    },
+    {
+        "企业名称": "深圳成谷科技秋季",
+        "企业性质": "待确认",
+        "招聘岗位": "详见官网",
+        "工作城市": "详见官网",
+        "招聘时间段": "2026年8月-招满即止",
+        "要求专业": "详见官网",
+        "要求学历": "本科及以上",
+        "招聘网址": "https://job.hust.edu.cn/zpinfo1/2410801.htm",
     },
 ]
