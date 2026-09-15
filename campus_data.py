@@ -5,7 +5,7 @@
 import datetime
 
 # 当前更新时间
-LAST_UPDATED = datetime.datetime.now().strftime("%Y-%m-%d %H:%M")  # 实际更新: 2026-09-15 10:55
+LAST_UPDATED = datetime.datetime.now().strftime("%Y-%m-%d %H:%M")  # 实际更新: 2026-09-15 16:07
 
 RECRUITMENT_DATA = [
     {
@@ -287,5 +287,25 @@ RECRUITMENT_DATA = [
         "要求专业": "详见官网",
         "要求学历": "本科及以上",
         "招聘网址": "https://job.ncepu.edu.cn/xjh/eda81253886b42d6a23e3e56b014f8f4.htm",
+    },
+    {
+        "企业名称": "深圳大漠大智控技术有限公司",
+        "企业性质": "待确认",
+        "招聘岗位": "详见官网",
+        "工作城市": "详见官网",
+        "招聘时间段": "2026年8月-招满即止",
+        "要求专业": "详见官网",
+        "要求学历": "本科及以上",
+        "招聘网址": "https://job.hust.edu.cn/zpinfo1/2409264.htm",
+    },
+    {
+        "企业名称": "飞亚达秋季",
+        "企业性质": "待确认",
+        "招聘岗位": "详见官网",
+        "工作城市": "详见官网",
+        "招聘时间段": "2026年8月-招满即止",
+        "要求专业": "详见官网",
+        "要求学历": "本科及以上",
+        "招聘网址": "https://job.hust.edu.cn/zpinfo1/2435032.htm",
     },
 ]
