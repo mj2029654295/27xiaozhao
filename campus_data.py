@@ -5,7 +5,7 @@
 import datetime
 
 # 当前更新时间
-LAST_UPDATED = datetime.datetime.now().strftime("%Y-%m-%d %H:%M")  # 实际更新: 2026-10-08 12:42
+LAST_UPDATED = datetime.datetime.now().strftime("%Y-%m-%d %H:%M")  # 实际更新: 2026-10-08 22:46
 
 RECRUITMENT_DATA = [
     {
@@ -2317,5 +2317,25 @@ RECRUITMENT_DATA = [
         "要求专业": "详见官网",
         "要求学历": "本科及以上",
         "招聘网址": "https://job.ncepu.edu.cn/xjh/664a4874d7a54af9a80f5d7d3836a422.htm",
+    },
+    {
+        "企业名称": "中国中煤能源集团有限公司 秋季校园",
+        "企业性质": "待确认",
+        "招聘岗位": "详见官网",
+        "工作城市": "详见官网",
+        "招聘时间段": "2026年8月-招满即止",
+        "要求专业": "详见官网",
+        "要求学历": "本科及以上",
+        "招聘网址": "https://job.ncepu.edu.cn/xjh/cdfcfcf8ca3b45bdb14611428418a339.htm",
+    },
+    {
+        "企业名称": "水电十一局大学生校园",
+        "企业性质": "待确认",
+        "招聘岗位": "详见官网",
+        "工作城市": "详见官网",
+        "招聘时间段": "2026年8月-招满即止",
+        "要求专业": "详见官网",
+        "要求学历": "本科及以上",
+        "招聘网址": "https://job.ncepu.edu.cn/xjh/4f42f46144ed49358f767f48a9143e8a.htm",
     },
 ]
