@@ -5,7 +5,7 @@
 import datetime
 
 # 当前更新时间
-LAST_UPDATED = datetime.datetime.now().strftime("%Y-%m-%d %H:%M")  # 实际更新: 2026-10-24 10:10
+LAST_UPDATED = datetime.datetime.now().strftime("%Y-%m-%d %H:%M")  # 实际更新: 2026-10-24 15:17
 
 RECRUITMENT_DATA = [
     {
@@ -2407,5 +2407,15 @@ RECRUITMENT_DATA = [
         "要求专业": "详见官网",
         "要求学历": "本科及以上",
         "招聘网址": "https://job.ncepu.edu.cn/zpgg/fd02dec713d4418a9de6d1bc61c2b46e.htm",
+    },
+    {
+        "企业名称": "中船第716所秋季（科研、财务、安全岗）",
+        "企业性质": "待确认",
+        "招聘岗位": "详见官网",
+        "工作城市": "详见官网",
+        "招聘时间段": "2026年8月-招满即止",
+        "要求专业": "详见官网",
+        "要求学历": "本科及以上",
+        "招聘网址": "https://job.hust.edu.cn/zpinfo1/2431931.htm",
     },
 ]
