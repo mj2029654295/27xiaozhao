@@ -5,7 +5,7 @@
 import datetime
 
 # 当前更新时间
-LAST_UPDATED = datetime.datetime.now().strftime("%Y-%m-%d %H:%M")  # 实际更新: 2026-10-26 12:08
+LAST_UPDATED = datetime.datetime.now().strftime("%Y-%m-%d %H:%M")  # 实际更新: 2026-10-26 22:13
 
 RECRUITMENT_DATA = [
     {
