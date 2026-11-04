@@ -5,7 +5,7 @@
 import datetime
 
 # 当前更新时间
-LAST_UPDATED = datetime.datetime.now().strftime("%Y-%m-%d %H:%M")  # 实际更新: 2026-11-04 13:41
+LAST_UPDATED = datetime.datetime.now().strftime("%Y-%m-%d %H:%M")  # 实际更新: 2026-11-04 23:07
 
 RECRUITMENT_DATA = [
     {
@@ -3837,5 +3837,25 @@ RECRUITMENT_DATA = [
         "要求专业": "详见官网",
         "要求学历": "本科及以上",
         "招聘网址": "https://job.hust.edu.cn/zpinfo1/2465800.htm",
+    },
+    {
+        "企业名称": "【双选会】邀请函丨12月22日 华北电力大学“心暖寒冬、岁末助航”线下双选会暨沙河高教联盟促就业专场会",
+        "企业性质": "待确认",
+        "招聘岗位": "详见官网",
+        "工作城市": "详见官网",
+        "招聘时间段": "2026年8月-招满即止",
+        "要求专业": "详见官网",
+        "要求学历": "本科及以上",
+        "招聘网址": "https://mp.weixin.qq.com/s/B17vXsW699P7C9AdJxcuPg",
+    },
+    {
+        "企业名称": "港华能源校园",
+        "企业性质": "待确认",
+        "招聘岗位": "详见官网",
+        "工作城市": "详见官网",
+        "招聘时间段": "2026年8月-招满即止",
+        "要求专业": "详见官网",
+        "要求学历": "本科及以上",
+        "招聘网址": "https://job.ncepu.edu.cn/zpgg/b1efdad4e6f64a278ed01b9a9d6acf50.htm",
     },
 ]
