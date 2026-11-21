@@ -5,7 +5,7 @@
 import datetime
 
 # 当前更新时间
-LAST_UPDATED = datetime.datetime.now().strftime("%Y-%m-%d %H:%M")  # 实际更新: 2026-11-21 14:04
+LAST_UPDATED = datetime.datetime.now().strftime("%Y-%m-%d %H:%M")  # 实际更新: 2026-11-21 22:42
 
 RECRUITMENT_DATA = [
     {
@@ -747,5 +747,15 @@ RECRUITMENT_DATA = [
         "要求专业": "详见官网",
         "要求学历": "本科及以上",
         "招聘网址": "https://job.ncepu.edu.cn/zpgg/dae87bbb9e894c0ebecbaae99db31932.htm",
+    },
+    {
+        "企业名称": "华鲲振宇2027校园",
+        "企业性质": "待确认",
+        "招聘岗位": "详见官网",
+        "工作城市": "详见官网",
+        "招聘时间段": "2026年8月-招满即止",
+        "要求专业": "详见官网",
+        "要求学历": "本科及以上",
+        "招聘网址": "https://job.ncepu.edu.cn/zpgg/f0ceefd4b9314a9fbb6b80d721cd6ba8.htm",
     },
 ]
