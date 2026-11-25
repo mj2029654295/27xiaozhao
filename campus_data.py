@@ -5,7 +5,7 @@
 import datetime
 
 # 当前更新时间
-LAST_UPDATED = datetime.datetime.now().strftime("%Y-%m-%d %H:%M")  # 实际更新: 2026-11-24 16:53
+LAST_UPDATED = datetime.datetime.now().strftime("%Y-%m-%d %H:%M")  # 实际更新: 2026-11-25 01:51
 
 RECRUITMENT_DATA = [
     {
@@ -917,5 +917,25 @@ RECRUITMENT_DATA = [
         "要求专业": "详见官网",
         "要求学历": "本科及以上",
         "招聘网址": "https://job.hust.edu.cn/zpinfo1/2470811.htm",
+    },
+    {
+        "企业名称": "中国供销集团有限公司2027年度 应届高校",
+        "企业性质": "待确认",
+        "招聘岗位": "详见官网",
+        "工作城市": "详见官网",
+        "招聘时间段": "2026年8月-招满即止",
+        "要求专业": "详见官网",
+        "要求学历": "本科及以上",
+        "招聘网址": "https://job.ncepu.edu.cn/zpgg/56372ba3fb9847f4ae2aafff78edeec9.htm",
+    },
+    {
+        "企业名称": "机械工业信息研究院 2027年度校园",
+        "企业性质": "待确认",
+        "招聘岗位": "详见官网",
+        "工作城市": "详见官网",
+        "招聘时间段": "2026年8月-招满即止",
+        "要求专业": "详见官网",
+        "要求学历": "本科及以上",
+        "招聘网址": "https://job.ncepu.edu.cn/zpgg/a694d8173d844fe4a8e4636c68f0f892.htm",
     },
 ]
